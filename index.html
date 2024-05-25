@@ -59,7 +59,7 @@
         transition: opacity .3s;
       }
 
-      input {
+      .contentInput {
         -webkit-appearance: none;
         appearance: none;
         display: block;
@@ -74,10 +74,15 @@
         transition: border .3s, box-shadow .3s;
       }
 
-      input:focus {
+      .contentInput:focus {
         box-shadow: 0 0 0 .25rem var(--color-primary-alpha);
         border-color: var(--color-primary);
         outline: 0;
+      }
+      
+      .wxCheck {
+        margin-left: 1rem;
+        margin-bottom: 1.5rem;
       }
 
       details {
@@ -206,13 +211,15 @@
     <header><h2>悬铃木短链接</h2></header>
     <main x-data="app" x-cloak>
       <p x-show.transition.opacity="alert" :class="alert?.type" x-text="alert?.message"></p>
-      <input placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
+      <input class="contentInput" placeholder="输入要缩短的网址..." x-model="url" x-ref="url" />
       <details>
         <summary>自定义设置</summary>
         <div>
-          <input placeholder="slug" x-model="slug" />
+          <input class="contentInput" placeholder="slug" x-model="slug" />
           <small>Slug 默认是随机生成的短 id。</small>
         </div>
+        <input type="checkbox" id="isWx" name="isWx" value="wx" class="wxCheck">
+        <label for="isWx">微信防红</label>
       </details>
       <button :class="{ loading }" :disabled="loading || isValidated()" @click="submit($refs, $nextTick)">生成</button>
     </main>
@@ -242,6 +249,12 @@
 
           this.alert = null
           this.loading = true
+
+          var isNeedWx = document.getElementById("isWx");
+          // 判断是否勾选了微信防红
+          if (isNeedWx.checked) {
+            this.url = "https://links.6688.dedyn.io?i=" + this.url;
+          }
 
           const body = { url: this.url }
           if (this.slug) body.slug = this.slug
